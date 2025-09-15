@@ -1,6 +1,7 @@
 export type TaskDto = {
   id: string;
   title: string;
+  description: string;
   priority: "HIGH" | "MEDIUM" | "LOW";
   status: "TODO" | "DONE";
   dueDate?: string | null;
@@ -18,3 +19,5 @@ export type Page<T> = {
     size: number;
     number: number;
 }
+
+export type Filter = Record<string, string | boolean | number | undefined>;

@@ -1,13 +1,16 @@
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient, type UseQueryResult } from "@tanstack/react-query";
 import { api } from "./client";
-import type { Page, TaskDto } from "./types";
+import { toTask } from "@/models/mappers";
+
+import type { Filter, Page, TaskDto } from "./types";
+import type { Task } from "@/models/Task";
 
 export function useTasks(
     page: number = 0,
     size: number = 20, 
-    sort: stirng = 'createdAt,desc',
-    filters: Record<string, any> = {}
-) {
+    sort: string = 'createdAt,desc',
+    filters: Filter = {}
+): UseQueryResult<Page<Task>> {
     const searchParams = new URLSearchParams({
         page: String(page),
         size: String(size),
@@ -19,6 +22,24 @@ export function useTasks(
 
     return useQuery({
         queryKey: ['tasks', page, size, sort, filters],
-        queryFn: () => api<Page<TaskDto>>(`/tasks?${searchParams.toString()}`)
+        queryFn: async () => {
+            const paged = await api<Page<TaskDto>>(`/tasks?${searchParams.toString()}`)
+            const content: Task[] = paged.content.map(toTask)
+            return { ...paged, content }
+        }
+    })
+}
+
+export type PagedTasks = UseQueryResult<Page<Task>>;
+
+export function useCreateTask() {
+    const qc = useQueryClient();
+    return useMutation({
+        mutationFn: (payload: Partial<TaskDto>) => 
+            api<TaskDto>('/tasks', {
+                method: 'POST',
+                body: JSON.stringify(payload)
+            }),
+        onSuccess: () => qc.invalidateQueries({ queryKey: ['tasks'] })            
     })
 }

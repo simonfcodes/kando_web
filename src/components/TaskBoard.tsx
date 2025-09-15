@@ -1,5 +1,6 @@
 import { useTasks } from "@/api/hooks";
 import { TaskTile } from "./TaskTile";
+import type { PagedTasks } from "@/api/hooks";
 
 export function TaskBoard() {
     const todo = useTasks(0, 50, 'createdAt,asc', { status: 'TODO', overdue: false})
@@ -15,7 +16,7 @@ export function TaskBoard() {
     )
 }
 
-function KanbanColumn({ title, query}: { title: string, query: ReturnType<typeof useTasks>}) {
+function KanbanColumn({ title, query}: { title: string, query: PagedTasks}) {
     const { data, isLoading, error } = query
     return (
         <section className="border rounded p-3 bg-gray-50">

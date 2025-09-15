@@ -1,9 +1,12 @@
-import { Button} from './ui/button'
-import type { TaskDto } from '@/api/types'
-import { api } from '@/api/client'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { Button} from './ui/button'
 
-export function TaskTile( { task }: { task: TaskDto }) {
+import type { Task } from '@/models/Task'
+import { api } from '@/api/client'
+
+
+export function TaskTile( { task }: { task: Task }) {    
+    
     const qc = useQueryClient();
 
     const markDone = useMutation({
@@ -22,7 +25,7 @@ export function TaskTile( { task }: { task: TaskDto }) {
         <li key={task.id} className="border rounded p-3">
             <header className="font-medium">{task.title}</header>
             <aside className="text-sm text-gray-600">{task.priority} • {task.status}</aside>
-            {task.dueDate && <time className="text-sm">Due: {task.dueDate}{task.dueTime ? ` ${task.dueTime}` : ''}</time>}
+            {task.dueDateIso && <time className="text-sm">Due: {task.dueDateIso}{task.dueTimeIso ? ` ${task.dueTimeIso}` : ''}</time>}
             <footer>
                 {task.status !== 'DONE' && (
                     <Button size="sm" variant="outline" onClick={() => markDone.mutate()} disabled={markDone.isPending}>
